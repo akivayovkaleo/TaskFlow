@@ -12,17 +12,20 @@ O TaskFlow é um gerenciador de tarefas completo, projetado para ajudar indivíd
 -   **Quadro Kanban**: Visualize e gerencie o fluxo de trabalho de forma intuitiva, movendo tarefas entre as colunas "A Fazer", "Fazendo" e "Concluído".
 -   **Visualização em Calendário**: Acompanhe os prazos e planeje suas tarefas com uma visão de calendário integrada.
 -   **Painel com Gráficos**: Monitore o progresso com um painel visual, que exibe gráficos de tarefas por status e prioridade.
--   **Acessibilidade**: Integrado com o widget VLibras para a tradução de conteúdo para a Língua Brasileira de Sinais.
+-   **Acessibilidade**: Integrado com o widget VLibras, modo de alto contraste e ajuste de tamanho de fonte.
 
 ## 🛠️ Tecnologias Utilizadas
 
--   **Frontend**: [Next.js](https://nextjs.org/) (React Framework)
--   **Backend e Banco de Dados**: [Firebase](https://firebase.google.com/) (Authentication, Firestore)
--   **Estilização**: [Tailwind CSS](https://tailwindcss.com/)
--   **UI/UX**: [Aceternity UI](https://ui.aceternity.com/), [Tremor](https://www.tremor.so/)
--   **Arrastar e Soltar**: [@dnd-kit/core](https://dndkit.com/)
--   **Validação de Formulários**: [React Hook Form](https://react-hook-form.com/), [Zod](https://zod.dev/)
--   **Notificações**: [React Hot Toast](https://react-hot-toast.com/)
+-   **Frontend**: Next.js (React Framework)
+-   **Backend e Banco de Dados**: Firebase (Authentication, Firestore)
+-   **Estilização**: Tailwind CSS
+-   **UI/UX**: Aceternity UI, Tremor
+-   **Arrastar e Soltar**: @dnd-kit/core
+-   **Validação de Formulários**: React Hook Form, Zod
+-   **Notificações**: Sonner
+-   **Animações**: Framer Motion
+-   **Ícones**: Lucide React
+-   **Calendário**: FullCalendar
 
 ## ⚙️ Configuração do Ambiente
 
@@ -30,8 +33,8 @@ Siga os passos abaixo para configurar e executar o projeto em seu ambiente de de
 
 ### Pré-requisitos
 
--   [Node.js](https://nodejs.org/) (versão 18 ou superior)
--   [npm](https://www.npmjs.com/) ou [yarn](https://yarnpkg.com/)
+-   Node.js (versão 18 ou superior)
+-   npm ou yarn
 
 ### Instalação
 
@@ -46,22 +49,17 @@ Siga os passos abaixo para configurar e executar o projeto em seu ambiente de de
     npm install
     ```
 
-3.  **Configure o Firebase:**
-    -   Crie um novo projeto no [Firebase Console](https://console.firebase.google.com/).
-    -   Adicione um novo aplicativo da web ao seu projeto.
-    -   Copie as credenciais do Firebase (apiKey, authDomain, etc.).
-
-4.  **Configure as Variáveis de Ambiente:**
+3.  **Configure as Variáveis de Ambiente:**
     -   Crie um arquivo `.env.local` na raiz do projeto.
     -   Adicione as credenciais do Firebase ao arquivo, como no exemplo abaixo:
         ```
-        NEXT_PUBLIC_FIREBASE_API_KEY="SUA_API_KEY"
-        NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN="SEU_AUTH_DOMAIN"
-        NEXT_PUBLIC_FIREBASE_PROJECT_ID="SEU_PROJECT_ID"
-        NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET="SEU_STORAGE_BUCKET"
-        NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID="SEU_MESSAGING_SENDER_ID"
-        NEXT_PUBLIC_FIREBASE_APP_ID="SEU_APP_ID"
-        NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID="SEU_MEASUREMENT_ID"
+        NEXT_PUBLIC_FIREBASE_API_KEY="YOUR_API_KEY"
+        NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN="YOUR_AUTH_DOMAIN"
+        NEXT_PUBLIC_FIREBASE_PROJECT_ID="YOUR_PROJECT_ID"
+        NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET="YOUR_STORAGE_BUCKET"
+        NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID="YOUR_MESSAGING_SENDER_ID"
+        NEXT_PUBLIC_FIREBASE_APP_ID="YOUR_APP_ID"
+        NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID="YOUR_MEASUREMENT_ID"
         ```
 
 ### Scripts Disponíveis
@@ -82,7 +80,10 @@ Siga os passos abaixo para configurar e executar o projeto em seu ambiente de de
     npm run start
     ```
 
--   **Para executar o linter:**
-    ```bash
-    npm run lint
-    ```
+## 🚀 Deploy na Vercel
+
+1.  **Faça o upload do seu projeto para o GitHub.**
+2.  **Crie uma conta na [Vercel](https://vercel.com/).**
+3.  **Conecte seu repositório do GitHub e importe o projeto.**
+4.  **Configure as variáveis de ambiente no painel da Vercel.**
+5.  **Faça o deploy!**
