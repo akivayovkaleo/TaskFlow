@@ -1,36 +1,47 @@
-// src/components/TaskList.tsx
 "use client";
 import { useTasks } from "@/hooks/useTasks";
-import TaskComponent from "./Task";
-import Link from "next/link";
+import { Task } from "@/types/task";
+import { useEffect } from "react";
+import { ProgressBar } from "@tremor/react";
 
-export default function TaskList() {
-  const { tasks, loading } = useTasks();
+export function TaskList() {
+  const { tasks, fetchTasks, deleteTask } = useTasks();
 
-  if (loading) {
-    return <p>Carregando tarefas...</p>;
-  }
+  useEffect(() => {
+    fetchTasks();
+  }, [fetchTasks]);
+
+  const calculateProgress = (task: Task) => {
+    if (task.subtasks.length === 0) return 0;
+    const completed = task.subtasks.filter((subtask) => subtask.done).length;
+    return (completed / task.subtasks.length) * 100;
+  };
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold">Suas Tarefas</h2>
-        <Link
-          href="/tasks/new"
-          className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700"
-        >
-          Nova Tarefa
-        </Link>
-      </div>
-      {tasks.length > 0 ? (
-        <div className="space-y-4">
-          {tasks.map((task) => (
-            <TaskComponent key={task.id} task={task} />
-          ))}
+      {tasks.map((task) => (
+        <div key={task.id} className="p-4 my-2 bg-white rounded-lg shadow-md">
+          <div className="flex justify-between">
+            <h3 className="text-lg font-bold">{task.title}</h3>
+            <div className="flex space-x-2">
+              <button className="text-blue-600">Edit</button>
+              <button
+                onClick={() => deleteTask(task.id)}
+                className="text-red-600"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+          <p className="text-gray-600">{task.description}</p>
+          <div className="mt-4">
+            <ProgressBar
+              value={calculateProgress(task)}
+              color={calculateProgress(task) === 100 ? "green" : "blue"}
+            />
+          </div>
         </div>
-      ) : (
-        <p>Nenhuma tarefa encontrada.</p>
-      )}
+      ))}
     </div>
   );
 }

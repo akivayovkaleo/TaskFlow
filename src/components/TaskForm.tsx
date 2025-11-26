@@ -1,44 +1,53 @@
-// src/components/TaskForm.tsx
 "use client";
-import { useForm, useFieldArray, Controller } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { TTaskSchema, taskSchema } from "@/lib/schemas";
-import { Task, Subtask } from "@/types";
-import { FiPlus, FiTrash } from "react-icons/fi";
-import { useState } from "react";
+import * as z from "zod";
+import { useTasks } from "@/hooks/useTasks";
+import { toast } from "sonner";
+import { Task } from "@/types/task";
+
+const taskSchema = z.object({
+  title: z.string().min(1, "Title is required"),
+  description: z.string().min(1, "Description is required"),
+  dueDate: z.string().min(1, "Due date is required"),
+  priority: z.enum(["low", "medium", "high"]),
+});
+
+type TaskFormValues = z.infer<typeof taskSchema>;
 
 interface TaskFormProps {
-  onSubmit: (data: TTaskSchema) => void;
-  initialData?: Task;
+  task?: Task;
+  onClose: () => void;
 }
 
-export default function TaskForm({ onSubmit, initialData }: TaskFormProps) {
+export function TaskForm({ task, onClose }: TaskFormProps) {
   const {
     register,
     handleSubmit,
-    control,
-    formState: { errors, isSubmitting },
-  } = useForm<TTaskSchema>({
+    formState: { errors },
+  } = useForm<TaskFormValues>({
     resolver: zodResolver(taskSchema),
-    defaultValues: initialData || {
+    defaultValues: task || {
       title: "",
       description: "",
-      priority: "média",
-      subtasks: [],
+      dueDate: "",
+      priority: "medium",
     },
   });
+  const { createTask, updateTask } = useTasks();
 
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: "subtasks",
-  });
-
-  const [newSubtaskTitle, setNewSubtaskTitle] = useState("");
-
-  const handleAddSubtask = () => {
-    if (newSubtaskTitle.trim() !== "") {
-      append({ title: newSubtaskTitle, isCompleted: false });
-      setNewSubtaskTitle("");
+  const onSubmit = async (data: TaskFormValues) => {
+    try {
+      if (task) {
+        await updateTask(task.id, data);
+        toast.success("Task updated successfully!");
+      } else {
+        await createTask({ ...data, status: "todo", subtasks: [] });
+        toast.success("Task created successfully!");
+      }
+      onClose();
+    } catch (error: any) {
+      toast.error(error.message);
     }
   };
 
@@ -49,136 +58,76 @@ export default function TaskForm({ onSubmit, initialData }: TaskFormProps) {
           htmlFor="title"
           className="block text-sm font-medium text-gray-700"
         >
-          Título
+          Title
         </label>
-        <div className="mt-1">
-          <input
-            {...register("title")}
-            id="title"
-            type="text"
-            className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-          />
-          {errors.title && (
-            <p className="mt-2 text-sm text-red-600">{`${errors.title.message}`}</p>
-          )}
-        </div>
-      </div>
-      <div>
-        <label
-          htmlFor="dueDate"
-          className="block text-sm font-medium text-gray-700"
-        >
-          Data de Vencimento
-        </label>
-        <div className="mt-1">
-          <input
-            {...register("dueDate")}
-            id="dueDate"
-            type="date"
-            className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-          />
-          {errors.dueDate && (
-            <p className="mt-2 text-sm text-red-600">{`${errors.dueDate.message}`}</p>
-          )}
-        </div>
+        <input
+          id="title"
+          type="text"
+          {...register("title")}
+          className="w-full px-3 py-2 mt-1 border rounded-md"
+        />
+        {errors.title && (
+          <p className="mt-1 text-sm text-red-600">{errors.title.message}</p>
+        )}
       </div>
       <div>
         <label
           htmlFor="description"
           className="block text-sm font-medium text-gray-700"
         >
-          Descrição
+          Description
         </label>
-        <div className="mt-1">
-          <textarea
-            {...register("description")}
-            id="description"
-            rows={4}
-            className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-          />
-          {errors.description && (
-            <p className="mt-2 text-sm text-red-600">{`${errors.description.message}`}</p>
-          )}
-        </div>
+        <textarea
+          id="description"
+          {...register("description")}
+          className="w-full px-3 py-2 mt-1 border rounded-md"
+        />
+        {errors.description && (
+          <p className="mt-1 text-sm text-red-600">
+            {errors.description.message}
+          </p>
+        )}
       </div>
-
-      {/* Priority Field */}
+      <div>
+        <label
+          htmlFor="dueDate"
+          className="block text-sm font-medium text-gray-700"
+        >
+          Due Date
+        </label>
+        <input
+          id="dueDate"
+          type="date"
+          {...register("dueDate")}
+          className="w-full px-3 py-2 mt-1 border rounded-md"
+        />
+        {errors.dueDate && (
+          <p className="mt-1 text-sm text-red-600">{errors.dueDate.message}</p>
+        )}
+      </div>
       <div>
         <label
           htmlFor="priority"
           className="block text-sm font-medium text-gray-700"
         >
-          Prioridade
+          Priority
         </label>
-        <div className="mt-1">
-          <select
-            {...register("priority")}
-            id="priority"
-            className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-          >
-            <option value="baixa">Baixa</option>
-            <option value="média">Média</option>
-            <option value="alta">Alta</option>
-          </select>
-        </div>
-      </div>
-
-      {/* Subtasks Field */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700">
-          Subtarefas
-        </label>
-        <div className="mt-1 space-y-2">
-          {fields.map((field, index) => (
-            <div key={field.id} className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                {...register(`subtasks.${index}.isCompleted`)}
-                className="h-4 w-4 text-indigo-600 border-gray-300 rounded"
-              />
-              <input
-                {...register(`subtasks.${index}.title`)}
-                className="flex-grow appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm sm:text-sm"
-                readOnly // Torna o título da subtarefa somente leitura após adicionado
-              />
-              <button
-                type="button"
-                onClick={() => remove(index)}
-                className="p-2 text-red-600 hover:text-red-800"
-              >
-                <FiTrash />
-              </button>
-            </div>
-          ))}
-        </div>
-        <div className="mt-2 flex items-center space-x-2">
-          <input
-            type="text"
-            value={newSubtaskTitle}
-            onChange={(e) => setNewSubtaskTitle(e.target.value)}
-            placeholder="Nova subtarefa"
-            className="flex-grow appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-          />
-          <button
-            type="button"
-            onClick={handleAddSubtask}
-            className="p-2 text-indigo-600 hover:text-indigo-800"
-            aria-label="Adicionar Subtarefa"
-          >
-            <FiPlus />
-          </button>
-        </div>
-      </div>
-
-      <div>
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+        <select
+          id="priority"
+          {...register("priority")}
+          className="w-full px-3 py-2 mt-1 border rounded-md"
         >
-          {isSubmitting ? "Salvando..." : "Salvar"}
-        </button>
+          <option value="low">Low</option>
+          <option value="medium">Medium</option>
+          <option value="high">High</option>
+        </select>
       </div>
+      <button
+        type="submit"
+        className="w-full py-2 text-white bg-red-600 rounded-md"
+      >
+        {task ? "Update Task" : "Create Task"}
+      </button>
     </form>
   );
 }
