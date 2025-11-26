@@ -125,7 +125,7 @@ export default function TaskForm({ onSubmit, initialData }: TaskFormProps) {
 
       {/* Subtasks Field */}
       <div>
-        <label className="block text-sm font-medium text-gray-700">
+        <label htmlFor="newSubtask" className="block text-sm font-medium text-gray-700">
           Subtarefas
         </label>
         <div className="mt-1 space-y-2">
@@ -153,6 +153,7 @@ export default function TaskForm({ onSubmit, initialData }: TaskFormProps) {
         </div>
         <div className="mt-2 flex items-center space-x-2">
           <input
+            id="newSubtask"
             type="text"
             value={newSubtaskTitle}
             onChange={(e) => setNewSubtaskTitle(e.target.value)}
