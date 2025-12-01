@@ -5,12 +5,13 @@ import * as z from "zod";
 import { useTasks } from "@/hooks/useTasks";
 import { toast } from "sonner";
 import { Task } from "@/types/task";
+import { useState } from "react";
 
 const taskSchema = z.object({
-  title: z.string().min(1, "Title is required"),
-  description: z.string().min(1, "Description is required"),
-  dueDate: z.string().min(1, "Due date is required"),
-  priority: z.enum(["low", "medium", "high"]),
+  title: z.string().min(1, "O título é obrigatório"),
+  description: z.string().optional(),
+  dueDate: z.string().optional(),
+  priority: z.enum(["baixa", "média", "alta"]).default("média"),
 });
 
 type TaskFormValues = z.infer<typeof taskSchema>;
@@ -21,6 +22,7 @@ interface TaskFormProps {
 }
 
 export function TaskForm({ task, onClose }: TaskFormProps) {
+  const [isLoading, setIsLoading] = useState(false);
   const {
     register,
     handleSubmit,
@@ -31,23 +33,34 @@ export function TaskForm({ task, onClose }: TaskFormProps) {
       title: "",
       description: "",
       dueDate: "",
-      priority: "medium",
+      priority: "média",
     },
   });
   const { createTask, updateTask } = useTasks();
 
   const onSubmit = async (data: TaskFormValues) => {
     try {
+      setIsLoading(true);
       if (task) {
-        await updateTask(task.id, data);
-        toast.success("Task updated successfully!");
+        await updateTask(task.id, {
+          ...data,
+          status: task.status || "A Fazer",
+        });
+        toast.success("Tarefa atualizada com sucesso!");
       } else {
-        await createTask({ ...data, status: "todo", subtasks: [] });
-        toast.success("Task created successfully!");
+        await createTask({
+          ...data,
+          status: "A Fazer",
+          subtasks: [],
+        });
+        toast.success("Tarefa criada com sucesso!");
       }
       onClose();
     } catch (error: any) {
-      toast.error(error.message);
+      console.error("Erro:", error);
+      toast.error("Erro: " + (error.message || "Tente novamente"));
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -58,76 +71,96 @@ export function TaskForm({ task, onClose }: TaskFormProps) {
           htmlFor="title"
           className="block text-sm font-medium text-gray-700"
         >
-          Title
+          Título *
         </label>
         <input
           id="title"
           type="text"
           {...register("title")}
-          className="w-full px-3 py-2 mt-1 border rounded-md"
+          placeholder="Título da tarefa"
+          className="w-full px-4 py-2 mt-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-navy focus:border-transparent"
         />
         {errors.title && (
-          <p className="mt-1 text-sm text-red-600">{errors.title.message}</p>
+          <p className="mt-1 text-sm text-crimson">{errors.title.message}</p>
         )}
       </div>
+
       <div>
         <label
           htmlFor="description"
           className="block text-sm font-medium text-gray-700"
         >
-          Description
+          Descrição
         </label>
         <textarea
           id="description"
           {...register("description")}
-          className="w-full px-3 py-2 mt-1 border rounded-md"
+          placeholder="Descrição detalhada da tarefa"
+          rows={4}
+          className="w-full px-4 py-2 mt-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-navy focus:border-transparent resize-none"
         />
         {errors.description && (
-          <p className="mt-1 text-sm text-red-600">
+          <p className="mt-1 text-sm text-crimson">
             {errors.description.message}
           </p>
         )}
       </div>
-      <div>
-        <label
-          htmlFor="dueDate"
-          className="block text-sm font-medium text-gray-700"
-        >
-          Due Date
-        </label>
-        <input
-          id="dueDate"
-          type="date"
-          {...register("dueDate")}
-          className="w-full px-3 py-2 mt-1 border rounded-md"
-        />
-        {errors.dueDate && (
-          <p className="mt-1 text-sm text-red-600">{errors.dueDate.message}</p>
-        )}
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label
+            htmlFor="dueDate"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Data de Vencimento
+          </label>
+          <input
+            id="dueDate"
+            type="date"
+            {...register("dueDate")}
+            className="w-full px-4 py-2 mt-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-navy focus:border-transparent"
+          />
+          {errors.dueDate && (
+            <p className="mt-1 text-sm text-crimson">{errors.dueDate.message}</p>
+          )}
+        </div>
+
+        <div>
+          <label
+            htmlFor="priority"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Prioridade
+          </label>
+          <select
+            id="priority"
+            {...register("priority")}
+            className="w-full px-4 py-2 mt-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-navy focus:border-transparent"
+          >
+            <option value="baixa">Baixa</option>
+            <option value="média">Média</option>
+            <option value="alta">Alta</option>
+          </select>
+        </div>
       </div>
-      <div>
-        <label
-          htmlFor="priority"
-          className="block text-sm font-medium text-gray-700"
+
+      <div className="flex gap-3 pt-4">
+        <button
+          type="submit"
+          disabled={isLoading}
+          className="flex-1 py-3 text-white bg-navy hover:bg-navy-dark rounded-lg font-semibold transition-colors disabled:opacity-50"
         >
-          Priority
-        </label>
-        <select
-          id="priority"
-          {...register("priority")}
-          className="w-full px-3 py-2 mt-1 border rounded-md"
+          {isLoading ? "Processando..." : task ? "Atualizar Tarefa" : "Criar Tarefa"}
+        </button>
+        <button
+          type="button"
+          onClick={onClose}
+          className="flex-1 py-3 text-navy bg-gray-100 hover:bg-gray-200 rounded-lg font-semibold transition-colors"
         >
-          <option value="low">Low</option>
-          <option value="medium">Medium</option>
-          <option value="high">High</option>
-        </select>
+          Cancelar
+        </button>
       </div>
-      <button
-        type="submit"
-        className="w-full py-2 text-white bg-red-600 rounded-md"
-      >
-        {task ? "Update Task" : "Create Task"}
-      </button>
     </form>
   );
 }
+

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { Toaster } from "react-hot-toast";
+import { Toaster } from "sonner";
 import { AuthProvider } from "@/hooks/useAuth";
 import { TaskProvider } from "@/hooks/useTasks";
 import Script from "next/script";
@@ -12,8 +12,9 @@ import { ThemeProvider } from "next-themes";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "TaskFlow",
-  description: "Gerenciador de Tarefas",
+  title: "TaskFlow - Gestor de Tarefas",
+  description: "Gerenciador de Tarefas com Dashboard, Kanban e Calendário",
+  keywords: "tarefas, gerenciador, taskflow, produtividade",
 };
 
 export default function RootLayout({
@@ -23,17 +24,23 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR">
-      <body className={`${inter.className} bg-background`}>
+      <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+      </head>
+      <body className={`${inter.className} bg-white`}>
         <ThemeProvider attribute="class">
           <AuthProvider>
             <TaskProvider>
-              <Toaster position="top-right" />
+              <Toaster position="top-right" richColors closeButton />
               <Navbar />
-              <main className="container mx-auto px-6 py-8">{children}</main>
+              <main className="container mx-auto px-4 md:px-6 py-8 min-h-screen">
+                {children}
+              </main>
               <Footer />
             </TaskProvider>
           </AuthProvider>
         </ThemeProvider>
+        {/* VLibras - Acessibilidade */}
         <div vw="true" className="enabled">
           <div vw-access-button="true" className="active"></div>
           <div vw-plugin-wrapper="true">
@@ -45,7 +52,7 @@ export default function RootLayout({
           strategy="beforeInteractive"
         />
         <Script id="vlibras-init" strategy="afterInteractive">
-          {`new window.VLibras.Widget('https://vlibras.gov.br/app');`}
+          {`if (typeof window !== 'undefined') { new window.VLibras.Widget('https://vlibras.gov.br/app'); }`}
         </Script>
       </body>
     </html>

@@ -1,5 +1,5 @@
 "use client";
-import { useState, createContext, useContext, ReactNode, useCallback } from "react";
+import { useState, createContext, useContext, ReactNode, useCallback, useEffect } from "react";
 import {
   collection,
   addDoc,
@@ -9,15 +9,16 @@ import {
   doc,
   query,
   where,
+  Timestamp,
 } from "firebase/firestore";
-import { db } from "@/firebase-config";
+import { db } from "@/lib/firebaseConfig";
 import { useAuth } from "./useAuth";
 import { Task } from "@/types/task";
 
 interface TaskContextData {
   tasks: Task[];
-  fetchTasks: () => void;
-  createTask: (task: Omit<Task, "id" | "userId">) => Promise<void>;
+  fetchTasks: () => Promise<void>;
+  createTask: (task: Omit<Task, "id" | "userId" | "createdAt">) => Promise<void>;
   updateTask: (taskId: string, updatedTask: Partial<Task>) => Promise<void>;
   deleteTask: (taskId: string) => Promise<void>;
 }
@@ -30,32 +31,70 @@ export function TaskProvider({ children }: { children: ReactNode }) {
 
   const fetchTasks = useCallback(async () => {
     if (user) {
-      const q = query(collection(db, "tasks"), where("userId", "==", user.uid));
-      const querySnapshot = await getDocs(q);
-      const tasksData = querySnapshot.docs.map(
-        (doc) => ({ id: doc.id, ...doc.data() } as Task)
-      );
-      setTasks(tasksData);
+      try {
+        const q = query(collection(db, "tasks"), where("userId", "==", user.uid));
+        const querySnapshot = await getDocs(q);
+        const tasksData = querySnapshot.docs.map((doc) => {
+          const data = doc.data();
+          return {
+            id: doc.id,
+            ...data,
+            createdAt: data.createdAt?.toDate?.() || new Date(),
+            updatedAt: data.updatedAt?.toDate?.() || new Date(),
+            dueDate: data.dueDate ? (typeof data.dueDate === 'string' ? data.dueDate : data.dueDate.toDate?.()) : undefined,
+          } as Task;
+        });
+        setTasks(tasksData);
+      } catch (error) {
+        console.error("Erro ao buscar tarefas:", error);
+      }
     }
   }, [user]);
 
-  const createTask = async (task: Omit<Task, "id" | "userId">) => {
+  useEffect(() => {
+    fetchTasks();
+  }, [user, fetchTasks]);
+
+  const createTask = async (task: Omit<Task, "id" | "userId" | "createdAt">) => {
     if (user) {
-      await addDoc(collection(db, "tasks"), { ...task, userId: user.uid });
-      fetchTasks();
+      try {
+        await addDoc(collection(db, "tasks"), {
+          ...task,
+          userId: user.uid,
+          createdAt: Timestamp.now(),
+          updatedAt: Timestamp.now(),
+        });
+        await fetchTasks();
+      } catch (error) {
+        console.error("Erro ao criar tarefa:", error);
+        throw error;
+      }
     }
   };
 
   const updateTask = async (taskId: string, updatedTask: Partial<Task>) => {
-    const taskDoc = doc(db, "tasks", taskId);
-    await updateDoc(taskDoc, updatedTask);
-    fetchTasks();
+    try {
+      const taskDoc = doc(db, "tasks", taskId);
+      await updateDoc(taskDoc, {
+        ...updatedTask,
+        updatedAt: Timestamp.now(),
+      });
+      await fetchTasks();
+    } catch (error) {
+      console.error("Erro ao atualizar tarefa:", error);
+      throw error;
+    }
   };
 
   const deleteTask = async (taskId: string) => {
-    const taskDoc = doc(db, "tasks", taskId);
-    await deleteDoc(taskDoc);
-    fetchTasks();
+    try {
+      const taskDoc = doc(db, "tasks", taskId);
+      await deleteDoc(taskDoc);
+      await fetchTasks();
+    } catch (error) {
+      console.error("Erro ao deletar tarefa:", error);
+      throw error;
+    }
   };
 
   return (
@@ -70,3 +109,4 @@ export function TaskProvider({ children }: { children: ReactNode }) {
 export function useTasks() {
   return useContext(TaskContext);
 }
+

@@ -17,14 +17,31 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        primary: "#FF0000", // Red
-        secondary: "#00FF00", // Green
+        // TaskFlow Custom Colors
+        "navy": "#001a4d", // Navy Blue (Azul Marinho)
+        "baby-blue": "#87ceeb", // Baby Blue (Azul Bebê)
+        "crimson": "#dc143c", // Crimson Red (Vermelho)
+        
+        // Primary and Secondary
+        primary: "#001a4d", // Navy Blue
+        secondary: "#87ceeb", // Baby Blue
+        accent: "#dc143c", // Crimson Red
         background: "#FFFFFF", // White
+        
+        // Extended palette
+        "navy-dark": "#000d26",
+        "navy-light": "#1a3a66",
+        "baby-blue-light": "#b0dff5",
+        "baby-blue-dark": "#5ba8d1",
+        "crimson-light": "#ff1f4d",
+        "crimson-dark": "#a80a2b",
       },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
         "gradient-conic":
           "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
+        "gradient-navy-blue": "linear-gradient(135deg, #001a4d 0%, #1a3a66 100%)",
+        "gradient-to-blue": "linear-gradient(135deg, #87ceeb 0%, #5ba8d1 100%)",
       },
     },
   },

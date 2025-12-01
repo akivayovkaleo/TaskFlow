@@ -1,29 +1,38 @@
 // src/app/tasks/new/page.tsx
 "use client";
 
-import Layout from "@/components/Layout";
-import TaskForm from "@/components/TaskForm";
-import { useTasks } from "@/hooks/useTasks";
-import { TTaskSchema } from "@/lib/schemas";
+import { TaskForm } from "@/components/TaskForm";
 import { useRouter } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
+import Link from "next/link";
 
 export default function NewTaskPage() {
-  const { addTask } = useTasks();
   const router = useRouter();
 
-  const handleAddTask = async (data: TTaskSchema) => {
-    await addTask(data);
-    router.push("/dashboard");
+  const handleClose = () => {
+    router.push("/tasks");
   };
 
   return (
-    <Layout>
-      <div className="max-w-2xl mx-auto">
-        <h1 className="text-2xl font-bold mb-4">Nova Tarefa</h1>
-        <div className="bg-white p-6 rounded-lg shadow-sm">
-          <TaskForm onSubmit={handleAddTask} />
-        </div>
+    <div className="max-w-2xl mx-auto">
+      <div className="mb-6">
+        <Link
+          href="/tasks"
+          className="flex items-center space-x-2 text-navy hover:text-navy-dark transition-colors mb-4"
+        >
+          <ArrowLeft size={20} />
+          <span>Voltar</span>
+        </Link>
+        <h1 className="text-4xl font-bold text-navy">Nova Tarefa</h1>
+        <p className="text-gray-600 mt-2">
+          Crie uma nova tarefa para organizar suas atividades
+        </p>
       </div>
-    </Layout>
+
+      <div className="bg-white rounded-lg shadow-lg p-8">
+        <TaskForm onClose={handleClose} />
+      </div>
+    </div>
   );
 }
+
