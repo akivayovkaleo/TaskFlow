@@ -227,6 +227,10 @@ src/
 - [x] Página de detalhes da tarefa
 - [x] 6+ recursos de acessibilidade
 
+### Deploy
+
+https://task-flow-mu-ten.vercel.app/
+
 ### Stack Tecnológico ✅
 - [x] Next.js 14+ (App Router)
 - [x] TypeScript
