@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useTasks } from "@/hooks/useTasks";
-import { Task, SubTask } from "@/types/task";
+import { Task, Subtask } from "@/types/task";
 import { Button } from "@tremor/react";
 
 const subtaskSchema = z.object({
@@ -29,27 +29,27 @@ export function SubTaskList({ task }: SubTaskListProps) {
   const { updateTask } = useTasks();
 
   const addSubtask = async (data: SubtaskFormValues) => {
-    const newSubtask: SubTask = {
+    const newSubtask: Subtask = {
       id: new Date().toISOString(),
       title: data.title,
-      done: false,
+      isCompleted: false,
     };
-    const updatedSubtasks = [...task.subtasks, newSubtask];
+    const updatedSubtasks = [...(task.subtasks || []), newSubtask];
     await updateTask(task.id, { subtasks: updatedSubtasks });
     reset();
   };
 
   const toggleSubtask = async (subtaskId: string) => {
-    const updatedSubtasks = task.subtasks.map((subtask) =>
+    const updatedSubtasks = (task.subtasks || []).map((subtask) =>
       subtask.id === subtaskId
-        ? { ...subtask, done: !subtask.done }
+        ? { ...subtask, isCompleted: !subtask.isCompleted }
         : subtask
     );
     await updateTask(task.id, { subtasks: updatedSubtasks });
   };
 
   const removeSubtask = async (subtaskId: string) => {
-    const updatedSubtasks = task.subtasks.filter(
+    const updatedSubtasks = (task.subtasks || []).filter(
       (subtask) => subtask.id !== subtaskId
     );
     await updateTask(task.id, { subtasks: updatedSubtasks });
@@ -71,15 +71,15 @@ export function SubTaskList({ task }: SubTaskListProps) {
         <p className="mt-1 text-sm text-red-600">{errors.title.message}</p>
       )}
       <div className="mt-4 space-y-2">
-        {task.subtasks.map((subtask) => (
+        {(task.subtasks || []).map((subtask) => (
           <div key={subtask.id} className="flex items-center">
             <input
               type="checkbox"
-              checked={subtask.done}
+              checked={subtask.isCompleted}
               onChange={() => toggleSubtask(subtask.id)}
               className="mr-2"
             />
-            <span className={subtask.done ? "line-through" : ""}>
+            <span className={subtask.isCompleted ? "line-through" : ""}>
               {subtask.title}
             </span>
             <button

@@ -18,6 +18,12 @@ const nextConfig = {
       fs: false,
       path: false,
       crypto: false,
+      // Ensure victory/recharts import the vendored d3 implementations
+      'victory-vendor/d3-shape': require.resolve('./node_modules/victory-vendor/lib-vendor/d3-shape/src/index.js'),
+      'victory-vendor/d3-scale': require.resolve('./node_modules/victory-vendor/lib-vendor/d3-scale/src/index.js'),
+      // fallback aliases for direct d3 imports
+      'd3-shape': require.resolve('./node_modules/victory-vendor/lib-vendor/d3-shape/src/index.js'),
+      'd3-scale': require.resolve('./node_modules/victory-vendor/lib-vendor/d3-scale/src/index.js'),
     };
 
     return config;

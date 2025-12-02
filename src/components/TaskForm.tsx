@@ -11,7 +11,7 @@ const taskSchema = z.object({
   title: z.string().min(1, "O título é obrigatório"),
   description: z.string().optional(),
   dueDate: z.string().optional(),
-  priority: z.enum(["baixa", "média", "alta"]).default("média"),
+  priority: z.enum(["baixa", "média", "alta"]).optional(),
 });
 
 type TaskFormValues = z.infer<typeof taskSchema>;
@@ -29,12 +29,26 @@ export function TaskForm({ task, onClose }: TaskFormProps) {
     formState: { errors },
   } = useForm<TaskFormValues>({
     resolver: zodResolver(taskSchema),
-    defaultValues: task || {
-      title: "",
-      description: "",
-      dueDate: "",
-      priority: "média",
-    },
+    defaultValues:
+      task
+        ? {
+            title: task.title,
+            description: task.description ?? "",
+            dueDate: task.dueDate
+              ? typeof task.dueDate === "string"
+                ? // assume it's already in YYYY-MM-DD or ISO format — take date portion
+                  task.dueDate.split("T")[0]
+                : // Date -> format to YYYY-MM-DD
+                  task.dueDate.toISOString().split("T")[0]
+              : "",
+            priority: task.priority ?? "média",
+          }
+        : {
+            title: "",
+            description: "",
+            dueDate: "",
+            priority: "média",
+          },
   });
   const { createTask, updateTask } = useTasks();
 
@@ -163,4 +177,6 @@ export function TaskForm({ task, onClose }: TaskFormProps) {
     </form>
   );
 }
+
+export default TaskForm;
 

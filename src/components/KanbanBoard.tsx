@@ -41,7 +41,7 @@ export default function KanbanBoard() {
     })
   );
 
-  const handleDragEnd = (event: DragEndEvent) => {
+  const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
     if (!over) return;
 
@@ -51,7 +51,7 @@ export default function KanbanBoard() {
     const activeTask = tasks.find((t) => t.id === activeId);
 
     if (activeTask && activeTask.status !== overId) {
-      updateTask({ ...activeTask, status: overId as Task["status"] });
+      await updateTask(activeTask.id, { status: overId as Task["status"] });
     }
   };
 

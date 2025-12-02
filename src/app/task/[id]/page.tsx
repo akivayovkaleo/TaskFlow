@@ -62,7 +62,7 @@ export default function TaskDetailPage() {
               task.priority === "média" ? "text-orange-500" :
               "text-green-500"
             }`}>
-              {task.priority?.charAt(0).toUpperCase() + task.priority?.slice(1)}
+              {task.priority ? (task.priority.charAt(0).toUpperCase() + task.priority.slice(1)) : "Sem prioridade"}
             </p>
           </div>
           <div>

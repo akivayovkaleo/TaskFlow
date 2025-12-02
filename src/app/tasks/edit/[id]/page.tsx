@@ -28,12 +28,7 @@ export default function EditTaskPage() {
     }
   }, [id, tasks, router]);
 
-  const handleUpdateTask = async (data: TTaskSchema) => {
-    if (task) {
-      await updateTask({ ...task, ...data });
-      router.push("/dashboard");
-    }
-  };
+  // Use TaskForm's built-in update behavior; pass task and onClose handler
 
   if (!task) {
     return (
@@ -48,7 +43,7 @@ export default function EditTaskPage() {
       <div className="max-w-2xl mx-auto">
         <h1 className="text-2xl font-bold mb-4">Editar Tarefa</h1>
         <div className="bg-white p-6 rounded-lg shadow-sm">
-          <TaskForm onSubmit={handleUpdateTask} initialData={task} />
+          <TaskForm task={task} onClose={() => router.push("/dashboard")} />
         </div>
       </div>
     </Layout>

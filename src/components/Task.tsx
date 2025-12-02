@@ -28,7 +28,7 @@ export default function TaskComponent({ task }: TaskProps) {
 
   const handleToggleStatus = () => {
     const newStatus = task.status === "A Fazer" ? "Concluído" : "A Fazer";
-    updateTask({ ...task, status: newStatus });
+    updateTask(task.id, { status: newStatus });
   };
 
   return (

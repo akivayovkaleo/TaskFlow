@@ -9,7 +9,7 @@ export default function DashboardMetrics() {
 
   const totalTasks = tasks.length;
   const completedTasks = tasks.filter(
-    (task) => task.status === "completed"
+    (task) => task.status === "Concluído"
   ).length;
   const pendingTasks = totalTasks - completedTasks;
 
