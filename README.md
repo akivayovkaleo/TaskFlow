@@ -210,22 +210,10 @@ src/
 ✅ Cores por prioridade  
 ✅ Detalhes em sidebar  
 ✅ Links para edição  
-
-## 🌐 Deploy
-
-### Vercel (Recomendado)
-1. Push para GitHub
-2. Acesse [vercel.com](https://vercel.com)
-3. Importe repositório
-4. Adicione env vars
-5. Deploy automático
-
 ### Outras Plataformas
 - Netlify
 - AWS Amplify
 - Firebase Hosting
-
-## 📊 Requisitos Atendidos
 
 ### Requisitos Funcionais ✅
 - [x] Landing page com responsivo
