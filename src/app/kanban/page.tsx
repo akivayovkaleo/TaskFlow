@@ -26,10 +26,9 @@ import Link from "next/link";
 interface SortableItemProps {
   id: string;
   task: Task;
-  onSelect?: (task: Task) => void;
 }
 
-function SortableTaskItem({ id, task, onSelect }: SortableItemProps) {
+function SortableTaskItem({ id, task }: SortableItemProps) {
   const {
     attributes,
     listeners,
@@ -65,7 +64,6 @@ function SortableTaskItem({ id, task, onSelect }: SortableItemProps) {
       className={`p-4 bg-white rounded-lg shadow-md hover:shadow-lg transition-all cursor-grab active:cursor-grabbing ${getPriorityColor(
         task.priority
       )}`}
-      onClick={() => onSelect?.(task)}
     >
       <div className="flex items-start gap-3">
         <div {...attributes} {...listeners} className="flex-shrink-0 mt-1">
@@ -94,14 +92,12 @@ interface KanbanColumnProps {
   id: string;
   title: string;
   tasks: Task[];
-  onSelectTask?: (task: Task) => void;
 }
 
 function KanbanColumnComponent({
   id,
   title,
   tasks,
-  onSelectTask,
 }: KanbanColumnProps) {
   return (
     <div className="flex flex-col bg-gray-100 rounded-lg p-4 min-h-[600px]">
@@ -124,11 +120,7 @@ function KanbanColumnComponent({
           ) : (
             tasks.map((task) => (
               <Link key={task.id} href={`/tasks/${task.id}`}>
-                <SortableTaskItem
-                  id={task.id}
-                  task={task}
-                  onSelect={onSelectTask}
-                />
+                <SortableTaskItem id={task.id} task={task} />
               </Link>
             ))
           )}
