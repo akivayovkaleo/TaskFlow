@@ -151,9 +151,7 @@ export default function KanbanPage() {
   }, [tasks]);
 
   const sensors = useSensors(
-    useSensor(PointerSensor, {
-      distance: 8,
-    }),
+    useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     })
